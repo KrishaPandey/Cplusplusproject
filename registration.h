@@ -1,3 +1,4 @@
+// Registration.h
 #ifndef REGISTRATION_H
 #define REGISTRATION_H
 
@@ -23,9 +24,8 @@ public:
         cout << "Confirm password: ";
         string confirm;
         cin  >> confirm;
-
         if (password != confirm) {
-            cout << "Passwords do not match.\n";
+            cout << "? Passwords do not match.\n";
             return;
         }
 
@@ -35,22 +35,33 @@ public:
         cin >> r;
         role = (r == 1 ? "Admin" : "Customer");
 
-        // 4) append to file (each record ends with '\n')
-        ofstream file("users.txt", ios::app);
-        if (!file) {
-            cout << "Could not open users.txt for writing.\n";
+        // 4) append to users.txt
+        ofstream uf("users.txt", ios::app);
+        if (!uf) {
+            cout << "? Could not open users.txt for writing.\n";
             return;
         }
+        uf << username << ' '
+           << password << ' '
+           << role     << '\n';
+        uf.close();
 
-        file << username << ' '
-             << password << ' '
-             << role     << '\n';
-        file.close();
-
-        cout << "Registered " 
-             << username << " as " << role << "\n";
+        // 5) append to balance.txt **only if Customer**
+        if (role == "Customer") {
+            ofstream bf("balance.txt", ios::app);
+            if (!bf) {
+                cout << "Warning: could not open balance.txt. Balance not initialized.\n";
+            } else {
+                bf << username << ' ' << 0.0 << '\n';
+                bf.close();
+            }
+            cout << "Registered " << username 
+                 << " as Customer with balance ?0.0\n";
+        }
+        else {
+            cout << "Registered " << username << " as Admin.\n";
+        }
     }
 };
 
 #endif // REGISTRATION_H
-
