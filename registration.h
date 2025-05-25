@@ -43,7 +43,10 @@ public:
         }
         uf << username << ' '
            << password << ' '
-           << role     << '\n';
+           << role     << ' '
+           <<0
+           <<'\n';
+           
         uf.close();
 
         // 5) append to balance.txt **only if Customer**
