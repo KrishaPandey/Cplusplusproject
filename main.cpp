@@ -4,6 +4,7 @@
 #include "Registration.h"
 #include "AdminPanel.h"
 #include "CustomerPanel.h"
+
 using namespace std;
 
 void showMainMenu() {
@@ -23,6 +24,8 @@ void showAdminMenu() {
          << "2) Dashboard (stub)\n"
          << "3) View all accounts\n"
          << "4) Delete account\n"
+         << "5) Unlock account\n"
+         << "6) Lock account\n"
          << "0) Logout\n"
          << "Choice: ";
 }
@@ -40,8 +43,9 @@ void showCustomerMenu() {
 int main() {
     while (true) {
         showMainMenu();
-        int choice; 
+        int choice;
         cin >> choice;
+
         if (choice == 0) {
             cout << "Goodbye!\n";
             break;
@@ -59,9 +63,12 @@ int main() {
             // Admin is now authenticated
             while (true) {
                 showAdminMenu();
-                int a; 
+                int a;
                 cin >> a;
-                if (a == 0) break;            // logout ? back to main
+
+                if (a == 0) {
+                    break;  // logout ? back to main
+                }
                 else if (a == 1) {
                     Registration rg;
                     rg.registerUser();
@@ -70,14 +77,20 @@ int main() {
                     cout << "[Dashboard stub]\n";
                 }
                 else if (a == 3) {
-                    // pass current admin’s username
                     AdminPanel ap(lg.getUsername());
                     ap.viewAllAccounts();
                 }
                 else if (a == 4) {
-                    // pass current admin’s username
                     AdminPanel ap(lg.getUsername());
                     ap.deleteAccount();
+                }
+                else if (a == 5) {
+                    AdminPanel ap(lg.getUsername());
+                    ap.unlockAccount();
+                }
+                else if (a == 6) {
+                    AdminPanel ap(lg.getUsername());
+                    ap.lockAccount();
                 }
                 else {
                     cout << "? Invalid choice.\n";
@@ -92,13 +105,15 @@ int main() {
             }
 
             if (lg.getRole() == "Admin") {
-                // pass current admin’s username
                 AdminPanel ap(lg.getUsername());
                 while (true) {
                     showAdminMenu();
-                    int a; 
+                    int a;
                     cin >> a;
-                    if (a == 0) break;        // logout
+
+                    if (a == 0) {
+                        break;  // logout ? back to main
+                    }
                     else if (a == 1) {
                         Registration rg;
                         rg.registerUser();
@@ -112,18 +127,26 @@ int main() {
                     else if (a == 4) {
                         ap.deleteAccount();
                     }
+                    else if (a == 5) {
+                        ap.unlockAccount();
+                    }
+                    else if (a == 6) {
+                        ap.lockAccount();
+                    }
                     else {
                         cout << "? Invalid choice.\n";
                     }
                 }
             } else {
-                // Customer path
                 CustomerPanel cp(lg.getUsername());
                 while (true) {
                     showCustomerMenu();
-                    int c; 
+                    int c;
                     cin >> c;
-                    if (c == 0) break;        // logout
+
+                    if (c == 0) {
+                        break;  // logout ? back to main
+                    }
                     else if (c == 1) {
                         cout << "[Customer dashboard stub]\n";
                     }
