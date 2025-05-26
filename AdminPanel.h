@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <iomanip>
 using namespace std;
 
 class AdminPanel {
@@ -33,7 +34,7 @@ public:
         }
     }
 
-    // 2) Delete account (now skipping the lockFlag field)
+    // 2) Delete account (and its balance entry)
     void deleteAccount() {
         cout << "Enter username to delete: ";
         string target;
@@ -59,11 +60,7 @@ public:
                 found = true;
                 continue;  // skip this user
             }
-            out << u << ' '
-                << p << ' '
-                << r << ' '
-                << lockFlag
-                << '\n';
+            out << u << ' ' << p << ' ' << r << ' ' << lockFlag << '\n';
         }
         in.close(); out.close();
 
@@ -79,29 +76,29 @@ public:
         cout << "Deleted user: " << target << "\n";
     }
 
-    // 3) Lock an account (set lockFlag = 1)
+    // 3) Lock an account
     void lockAccount() {
         cout << "Enter username to lock: ";
         string target;
         cin >> target;
 
         if (target == "admin") {
-            cout << " Cannot lock superadmin.\n";
+            cout << "? Cannot lock superadmin.\n";
             return;
         }
         if (target == currentAdmin) {
-            cout << " You cannot lock your own account.\n";
+            cout << "? You cannot lock your own account.\n";
             return;
         }
 
         ifstream fin("users.txt");
         ofstream fout("users.tmp");
         if (!fin) {
-            cout << " Cannot open users.txt\n";
+            cout << "? Cannot open users.txt\n";
             return;
         }
 
-        bool   found = false;
+        bool found = false;
         string u, p, r;
         int    lockFlag;
         while (fin >> u >> p >> r >> lockFlag) {
@@ -109,11 +106,7 @@ public:
                 lockFlag = 1;
                 found = true;
             }
-            fout << u << ' '
-                 << p << ' '
-                 << r << ' '
-                 << lockFlag
-                 << '\n';
+            fout << u << ' ' << p << ' ' << r << ' ' << lockFlag << '\n';
         }
         fin.close(); fout.close();
 
@@ -128,27 +121,25 @@ public:
         cout << "User " << target << " has been locked.\n";
     }
 
-    // 4) Unlock an account (set lockFlag = 0)
-        void unlockAccount() {
+    // 4) Unlock an account
+    void unlockAccount() {
         cout << "Enter username to unlock: ";
         string target;
         cin >> target;
 
-        // 1) Open and scan for the user and its lockFlag
         ifstream fin("users.txt");
         if (!fin) {
             cout << "? Cannot open users.txt\n";
             return;
         }
 
-        bool   found = false;
+        bool found = false;
         string u, p, r;
         int    lockFlag;
         while (fin >> u >> p >> r >> lockFlag) {
             if (u == target) {
                 found = true;
                 if (lockFlag == 0) {
-                    // user exists but is not locked
                     cout << "? User \"" << target << "\" is not locked.\n";
                     fin.close();
                     return;
@@ -163,26 +154,18 @@ public:
             return;
         }
 
-        
         ifstream fin2("users.txt");
         ofstream fout("users.tmp");
         while (fin2 >> u >> p >> r >> lockFlag) {
             if (u == target) lockFlag = 0;
-            fout << u << ' '
-                 << p << ' '
-                 << r << ' '
-                 << lockFlag << '\n';
+            fout << u << ' ' << p << ' ' << r << ' ' << lockFlag << '\n';
         }
-        fin2.close();
-        fout.close();
+        fin2.close(); fout.close();
 
-        // 3) Swap in the updated file
         remove("users.txt");
         rename("users.tmp", "users.txt");
-
         cout << "User \"" << target << "\" has been unlocked.\n";
     }
-
 
     // 5) Remove balance entry when deleting
     void removeBalance(string user) {
@@ -196,6 +179,76 @@ public:
         fin.close(); fout.close();
         remove("balance.txt");
         rename("balance.tmp", "balance.txt");
+    }
+
+    // 6) View a Customer’s full transaction history
+    void viewTransactions() {
+        cout << "Enter customer username to view transactions: ";
+        string target;
+        cin  >> target;
+
+        // Verify user exists and is Customer
+        ifstream uf("users.txt");
+        if (!uf) {
+            cout << "? Cannot open users.txt\n";
+            return;
+        }
+        bool found = false;
+        string u, p, r;
+        int    lf;
+        while (uf >> u >> p >> r >> lf) {
+            if (u == target) {
+                found = true;
+                if (r != "Customer") {
+                    cout << "? User \"" << target << "\" is not a Customer.\n";
+                    uf.close();
+                    return;
+                }
+                break;
+            }
+        }
+        uf.close();
+        if (!found) {
+            cout << "? User not found.\n";
+            return;
+        }
+
+        // Read and display transactions.txt
+        ifstream tf("transactions.txt");
+        if (!tf) {
+            cout << "? No transactions logged yet.\n";
+            return;
+        }
+
+        cout << "\n-- Transactions for " << target << " --\n\n"
+             << left
+             << setw(12) << "Date"
+             << setw(10) << "Time"
+             << setw(10) << "Type"
+             << setw(12) << "Amount"
+             << setw(15) << "Balance\n"
+             << string(59, '-') << "\n";
+
+        bool any = false;
+        string date, time, typ;
+        double amount, balAfter;
+        while (tf >> u >> date >> time >> typ >> amount >> balAfter) {
+            if (u != target) continue;
+            any = true;
+            cout << left
+                 << setw(12) << date
+                 << setw(10) << time
+                 << setw(10) << typ
+                 << setw(12) << fixed << setprecision(2) << amount
+                 << setw(15) << fixed << setprecision(2) << balAfter
+                 << "\n";
+        }
+        tf.close();
+
+        if (!any) {
+            cout << "? No transactions found for this customer.\n";
+        }
+        cout << "\n";
     }
 };
 
