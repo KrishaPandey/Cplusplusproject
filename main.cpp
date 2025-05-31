@@ -1,5 +1,7 @@
 // main.cpp
+
 #include <iostream>
+#include <fstream>
 #include "Login.h"
 #include "Registration.h"
 #include "AdminPanel.h"
@@ -38,17 +40,19 @@ void showCustomerMenu() {
          << "4) Withdraw money\n"
          << "5) Change password\n"
          << "6) View mini-statement\n"
+         << "7) Transfer money\n"
          << "0) Logout\n"
          << "Choice: ";
 }
 
 int main() {
-    // ensure transactions.txt exists
+    // Ensure transactions.txt exists
     { ofstream touch("transactions.txt", ios::app); }
 
     while (true) {
         showMainMenu();
-        int choice; cin >> choice;
+        int choice;
+        cin >> choice;
 
         if (choice == 0) {
             cout << "Goodbye!\n";
@@ -65,16 +69,47 @@ int main() {
             }
             while (true) {
                 showAdminMenu();
-                int a; cin >> a;
+                int a;
+                cin >> a;
                 if (a == 0) break;
-                else if (a == 1) { Registration rg; rg.registerUser(); }
-                else if (a == 2) cout << "[Dashboard stub]\n";
-                else if (a == 3) { AdminPanel ap(lg.getUsername()); ap.viewAllAccounts(); }
-                else if (a == 4) { AdminPanel ap(lg.getUsername()); ap.deleteAccount(); }
-                else if (a == 5) { AdminPanel ap(lg.getUsername()); ap.unlockAccount(); }
-                else if (a == 6) { AdminPanel ap(lg.getUsername()); ap.lockAccount(); }
-                else if (a == 7) { AdminPanel ap(lg.getUsername()); ap.viewTransactions(); }
-                else cout << "? Invalid choice.\n";
+                switch (a) {
+                    case 1: {
+                        Registration rg;
+                        rg.registerUser();
+                        break;
+                    }
+                    case 2:
+                        cout << "[Dashboard stub]\n";
+                        break;
+                    case 3: {
+                        AdminPanel ap(lg.getUsername());
+                        ap.viewAllAccounts();
+                        break;
+                    }
+                    case 4: {
+                        AdminPanel ap(lg.getUsername());
+                        ap.deleteAccount();
+                        break;
+                    }
+                    case 5: {
+                        AdminPanel ap(lg.getUsername());
+                        ap.unlockAccount();
+                        break;
+                    }
+                    case 6: {
+                        AdminPanel ap(lg.getUsername());
+                        ap.lockAccount();
+                        break;
+                    }
+                    case 7: {
+                        AdminPanel ap(lg.getUsername());
+                        ap.viewTransactions();
+                        break;
+                    }
+                    default:
+                        cout << "? Invalid choice.\n";
+                        break;
+                }
             }
         }
         else if (choice == 2) {
@@ -86,31 +121,71 @@ int main() {
                 AdminPanel ap(lg.getUsername());
                 while (true) {
                     showAdminMenu();
-                    int a; cin >> a;
+                    int a;
+                    cin >> a;
                     if (a == 0) break;
-                    else if (a == 1) { Registration rg; rg.registerUser(); }
-                    else if (a == 2) cout << "[Dashboard stub]\n";
-                    else if (a == 3) ap.viewAllAccounts();
-                    else if (a == 4) ap.deleteAccount();
-                    else if (a == 5) ap.unlockAccount();
-                    else if (a == 6) ap.lockAccount();
-                    else if (a == 7) ap.viewTransactions();
-                    else cout << "? Invalid choice.\n";
+                    switch (a) {
+                        case 1: {
+                            Registration rg;
+                            rg.registerUser();
+                            break;
+                        }
+                        case 2:
+                            cout << "[Dashboard stub]\n";
+                            break;
+                        case 3:
+                            ap.viewAllAccounts();
+                            break;
+                        case 4:
+                            ap.deleteAccount();
+                            break;
+                        case 5:
+                            ap.unlockAccount();
+                            break;
+                        case 6:
+                            ap.lockAccount();
+                            break;
+                        case 7:
+                            ap.viewTransactions();
+                            break;
+                        default:
+                            cout << "? Invalid choice.\n";
+                            break;
+                    }
                 }
-            }
-            else {
+            } else {
                 CustomerPanel cp(lg.getUsername());
                 while (true) {
                     showCustomerMenu();
-                    int c; cin >> c;
+                    int c;
+                    cin >> c;
                     if (c == 0) break;
-                    else if (c == 1) cout << "[Customer dashboard stub]\n";
-                    else if (c == 2) cp.viewBalance();
-                    else if (c == 3) cp.depositMoney();
-                    else if (c == 4) cp.withdrawMoney();
-                    else if (c == 5) cp.changePassword();
-                    else if (c == 6) cp.viewMiniStatement();
-                    else cout << "? Invalid choice.\n";
+                    switch (c) {
+                        case 1:
+                            cout << "[Customer dashboard stub]\n";
+                            break;
+                        case 2:
+                            cp.viewBalance();
+                            break;
+                        case 3:
+                            cp.depositMoney();
+                            break;
+                        case 4:
+                            cp.withdrawMoney();
+                            break;
+                        case 5:
+                            cp.changePassword();
+                            break;
+                        case 6:
+                            cp.viewMiniStatement();
+                            break;
+                        case 7:
+                            cp.transferMoney();
+                            break;
+                        default:
+                            cout << "? Invalid choice.\n";
+                            break;
+                    }
                 }
             }
         }
