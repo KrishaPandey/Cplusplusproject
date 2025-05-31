@@ -1,3 +1,4 @@
 admin admin123 Admin 0 
 krisha kkkk Customer 0 
 admink k12345 Admin 0
+Ram ram123 Customer 0
