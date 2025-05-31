@@ -17,4 +17,3 @@ inline string currentTimestamp() {
 }
 
 #endif // TIMESTAMPHELPER_H
-
